@@ -1,159 +1,54 @@
-# Mutant
-## _Proyecto para evaluar ADN humanos y determinar si son o no mutantes._
-
-[![N|Solid](https://github.com/dpanqueva/mutant/blob/main/img/sombra.png)]()
+# Afiliaciones 
+## _Micro servicios para realizar la afiliación de clientes a diferentes programas._
 
 ## Instrucciones
 Recomendaciones a tener en cuenta:
-- Ambiente Java local en la versión 11 (OpenJdk)
-- Una base de datos en postgressql o en su defecto ajustar el contexto de trabajo del microservicio a H2.
+- Una base de datos en MySql.
 - Tener instalado el gestor de paquetes Maven.
-- Postman o soap ui (herramienta para realizar consumos a rest).
+- Postman (herramienta para realizar consumos a rest).
 
 ## Instalación
 
-Cree la base de datos:
-```sh
-create database meli;
-```
-
-Una vez dentro de la base de datos debemos crear la tabla o dejar que el ms al desplegar la cree.
-Aquí el ejemplo:
-
-```sh
-create table tbl_adn (
-id serial PRIMARY KEY,
-adn_mutant varchar(255),
-sn_mutant BOOLEAN 
-);
-```
-
-Descargue el proyecto del repositorio [GitHub](https://github.com/dpanqueva/mutant).
-
-Siguiendo el comando:
-
-```sh
-cd carpeta-proyecto
-git clone https://github.com/dpanqueva/mutant.git
-```
-
-Una vez descargo el proyecto por favor ingresar a la carpeta 
-> mutant
-
-una vez allí en la carpeta, es necesario descargar los paquetes necesarios para su correcto funcionamiento.
-Para este proceso seguimos el siguiente comando:
-
-```sh
-mvn clean install
-```
+- Se debe descargar este Respositorio, donde se encuentran los 4 micro servicios
+- Importar individualmente los 4 Proyectos en el ambiente qeu utilice (Eclipse, Intellij Idea, Visual Studio)
+- Al dar Run en alguno de los proyecto, se conectará a la Base de datos que esté en su local, ya que en el propperties de cada uno de los proyectos tiene su s respectivas credenciales
+- La Base de datos se actualizará a como está desarrollada en el Proyecto
 
 ## Run (desplegar proyecto)
-Para correr el proyecto, se debe ingresar a la carpeta donde se descargo el código fuente (git), abrir la consola y ejecutar el siguiente comando:
-Antes de desdplegar el proyecto, debemos ubicar la carpeta (en la raiz del pryecto) target, allí se encuentra el jar generado por maven con todo lo correspondiente a la ejecución, nos situamos en dentro de esta carpeta y ejecutamos en consola:
-```sh
-java -jar mutant-0.0.1-SNAPSHOT.jar
-```
-Ya con esto nuestro proyecto ha quedado desplegado y listo para probar.
 
-[![N|Solid](https://github.com/dpanqueva/mutant/blob/main/img/despliegueJava.PNG)]()
-
+- Para probar los Micro Servicios se deberá importar la colección de Postman que fue enviada al correo
+- La colección está separada por Micro servicios, asi que se probarán los servicios del proyecto que esté desplegado
 
 ## Ejecución
-Para la ejecución, en mi caso utilizare [Postman](https://www.postman.com/downloads/), ya en la herramienta debemos tener en cuenta los endposints:
-
-> Tener en cuenta el ambiente al cual se le va a realizar la prueba
-
-| Operacion | Endpoint |
-| ------ | ------ |
-| GET | [localhost:8005/api/V1/stats] |
-| POST | [localhost:8005/api/V1/mutant] |
-| GET | [https://meli-test-mutant.herokuapp.com/api/V1/stats] |
-| POST | [https://meli-test-mutant.herokuapp.com/api/V1/mutant] |
-
-para la operación POST el cuerpo del consumo es:
-> {
-> "dna":["ATGCGA","CAGTGC","TTATGT","AGAAGG","CCCCTA","TCACTG"]
-> }
+En la Colección de postamn está ordenada por Micro Servicios, con su respoectivo body si es para registrar o para actualizar
 
 ## Respuestas esperadas
-Para la operación POST, esperamos las respuestas.
-Respuesta con Éxitoso (es mutante):
+Para los servicios que consultan algun dato en la base de datos, tiene 2 opciones, o encontrarlo y respon
 > {
 >    "code": 200,
 >    "dateAt": "2021-07-27 11:26:24",
->    "message": "Successfully evaluated DNA"
+>    "response": "Response exitosa"
 >}
 
-Respuesta 403 (no mutante):
+O no encontrarlo y mostrar la excepción personalizada del notFound
 > {
->    "code": 403,
+>    "code": 401
 >    "dateAt": "2021-07-27 15:23:48",
->    "message": "The evaluated dna belongs to a human"
+>    "message": "Upss, no se encontraron resultados"
 > }
 
-## Curl
+## Pruebas Unitarias
 
-Metodo de envio POST, para analizar un ADN
+Cada uno de los Micro Servicios tiene Pruebas Unitarias, el total de las pruebas está a un 90% de exitoso, pero los Services tienen 100%.
 
+Esto se puede comprobar con el Coverage As JUnit, que ya viene implementado como depencia en cada uno de los proyectos .
+
+## Documentación Swagger
+Cada uno de los proyectos tiene implementada la dependencia de Swagger, donde al desplegar cada uno de los proyect, se podrá acceder a la siguiente url y comporbar su documentación
 ```sh
-curl --location --request POST 'https://meli-test-mutant.herokuapp.com/api/V1/mutant' \
- --header 'Content-Type: application/json' \
- --data-raw '{
- "dna":["TTGCGA","CAGTGC","TTATGT","AGAAGG","CCCCTA","TCACTG"]
- }'
+{{puerto_donde_esté_corriendo}}/swagger-ui/index.html#/
 ```
+## Branching
+La ramificación se realizo en cada uno de los micro servicios, se desarrollo cada en su propia rama, para al final realizar el Merge con la rama Master
 
-Metodo de envio GET, para obtener estadisticas
-```sh 
-curl --location --request GET 'https://meli-test-mutant.herokuapp.com/api/V1/stats'
-```
-
-> Cuando se descargue la prueba, en la carpeta img se encuentra el proyecto postman [Proyecto-postman](https://github.com/dpanqueva/mutant/tree/main/img)
-
-## Tech
-Para la solución de este reto, se implemento:
-| Herramienta | Url |
-| ------ | ------ |
-| Java | [OpenJdk](https://openjdk.java.net/projects/jdk/11/) |
-| Maven | [Maven](https://maven.apache.org/download.cgi) |
-| Intellij Idea | [Intellij](https://www.jetbrains.com/es-es/idea/download) |
-| GitHub | [https://github.com/](https://github.com/) |
-| Spring Boot | [https://start.spring.io/](https://start.spring.io/) |
-| H2 | [H2 Databse](https://mvnrepository.com/artifact/com.h2database/h2/1.4.200) |
-| PostgresSql | [H2 Databse](https://www.postgresql.org/download/) |
-| Junit5 | [Junit](https://junit.org/junit5/) |
-
-## Pruebas unitarias
-Coverages en el 80% de la ejecución de las pruebas.
-[![N|Solid](https://github.com/dpanqueva/mutant/blob/main/img/coverage.PNG)]()
-
-## SonarQube
-Código limpio de acuerdo al análisis de [SonarQube](https://www.sonarqube.org/)
-```sh
-mvn sonar:sonar -Dsonar.projectKey=mutant -Dsonar.host.url=http://localhost:9000 -Dsonar.login=311c3ec79d0f94c616f7c924ed883c06eb178c29
-```
-[![N|Solid](https://github.com/dpanqueva/mutant/blob/main/img/sonarqubeCorreccion.PNG)]()
-
-## Despliegue cloud
-Se realiza en [Heroku](https://dashboard.heroku.com/apps), con una base de datos postgresql (La cual es suministrada por heroku identificando el pom.xml en la construcción del despliegue).
-
-```sh
-cd carpeta-proyecto
-heroku login
-git init
-git status
-git add .
-git commit -m "primer commit"
-heroku apps:create meli-test-mutant
-git push heroku master
-heroku open
-```
-> Tener en cuenta que para java 11 es necesrio crear un archivo en la raiz del > proyecto system.properties para especificar que heroku debe trabajar con 
-> java 11. Allí se especifica la siguiente propiedad:
-
-```sh
-java.runtime.version=11
-```
-
-## Gracias!!
-
+## Muchas Gracias!! 
